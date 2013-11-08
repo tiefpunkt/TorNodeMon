@@ -20,7 +20,7 @@ function getNodeStatus($fingerprint) {
 	if ($data === false) {
 		throw new Exception("Could not connect to TorStatus.");
 	}
-	
+	$data = str_replace(array("\r\n", "\n", "\r"),"",$data);
 	$result = array("fingerprint" => $fingerprint);
 	if (strpos($data, "ERROR -- No Descriptor Available") === false) {
 		$result["status"] = "online";
@@ -90,7 +90,7 @@ try {
 			<?php foreach ($data as $status) { 
 				if ($status["status"] == "online") {
 				?>
-				<li><?= $status["name"] ?>(<?= $status["fingerprint"] ?>): online (<?= $status["bandwidth_observed"] ?>bps)</li>
+				<li><?= $status["name"] ?> (<?= $status["fingerprint"] ?>): online (<?= $status["bandwidth_observed"] ?> bps)</li>
 				<?php } else { ?>
 					<li><?= $status["fingerprint"] ?>: offline</li>
 			<?php } } ?>
