@@ -13,6 +13,9 @@ $nodes = explode(",",$family);
 /* Alternative array for node fingerprints */
 // $nodes = array("f41ca13853aac988ef2f1a378fb3c9f66cdeafca", "f41ca13853aac988ef2f1a378fb3c9f66cdeafcb");
 
+$cache = "cache/data.js";
+$cache_expire = 300;
+
 function getNodeStatus($fingerprint) {
 	$url = "http://torstatus.blutmagie.de/router_detail.php?FP=" . $fingerprint;
 	
@@ -62,12 +65,19 @@ function getNodeStatus($fingerprint) {
 }
 $error = false;
 $data = Array();
-try {
-	foreach ($nodes as $node) {
-		$data[$node] = getNodeStatus($node);
+
+if (file_exists($cache) && (time() < filemtime($cache) + $cache_expire)) {
+	// It is. Let's use that as our output.
+	$data = json_decode(file_get_contents($cache),true);
+} else {
+	try {
+		foreach ($nodes as $node) {
+			$data[$node] = getNodeStatus($node);
+		}
+		file_put_contents($cache, json_encode($data));
+	} catch (Exception $e) {
+		$error = "Could not fetch node status";
 	}
-} catch (Exception $e) {
-	$error = "Could not fetch node status";
 }
 
 ?>
